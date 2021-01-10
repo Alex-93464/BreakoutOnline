@@ -1,0 +1,16 @@
+#gameCanvas{
+    width: 100%;
+    height: 100%;
+    border: 1px solid #000000;
+    position: relative;
+}
+
+#gameContainer{
+    width: 640px;
+    height: 320px;
+    margin: auto;
+}
+
+#spriteSheet{
+    display: none;
+}
