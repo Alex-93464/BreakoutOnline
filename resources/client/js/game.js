@@ -60,8 +60,53 @@ window.onload=function () {
             }
         },
 
-        hitBrick:function () {
+        checkBricks:function () {
+            if (ball.x+ball.dx>=100
+                && ball.x+ball.dx<=494
+                && ball.y+ball.dy<=140
+                && ball.y+ball.dy>=10
+            ){
+                let row=Math.floor((ball.y+ball.dy-10)/33);
+                let col=Math.floor((ball.x+ball.dx-100)/66);
+                console.log(col,row);
+                let onEdgeX=false;
+                let onEdgeY=false;
+                if (col!==5 && (ball.x+ball.dx-100)%66>=43){
+                    onEdgeX=true;
+                }
+                if (row!==3 && (ball.y+ball.dy-10)%33>=10){
+                    onEdgeY=true;
+                }
+                ball.hitBrick(row,col);
+                if (onEdgeX){
+                    ball.hitBrick(row,col+1);
+                }
+                if (onEdgeY){
+                    ball.hitBrick(row+1,col);
+                }
+                if (onEdgeX && onEdgeY){
+                    ball.hitBrick(row+1,col+1);
+                }
+            }
+        },
 
+        hitBrick:function (row, col) {
+            let brick=operator.bricks[row][col];
+            ctx.drawImage(spriteSheet,1,40,64,31,brick.x,brick.y,64,31);
+            if (brick.alive
+                && ball.x+ball.dx>=brick.x-23
+                && ball.x+ball.dx<=brick.x+64
+                && ball.y+ball.dy>=brick.y-23
+                && ball.y+ball.dy<=brick.y+31
+            ){
+                if ((ball.dx>0 && ball.x+ball.dx<brick.x) || ball.x+ball.dx>brick.x+41){
+                    ball.dx*=-1;
+                }
+                if ((ball.dy>0 && ball.y+ball.dy<brick.y) || ball.y+ball.dy>brick.y+8){
+                    ball.dy*=-1;
+                }
+                brick.destroy();
+            }
         },
 
         redraw:function () {
@@ -69,6 +114,7 @@ window.onload=function () {
             //Check for collisions
             ball.hitEdge();
             ball.hitPaddle();
+            ball.checkBricks();
             ball.x+=ball.dx;
             ball.y+=ball.dy;
             ctx.drawImage(spriteSheet,1,80,23,23,ball.x,ball.y,23,23);
@@ -96,16 +142,15 @@ window.onload=function () {
         startLevel:function () {
             ctx.clearRect(0,0,640,320);
             ball.x=320;
-            ball.y=275;
+            ball.y=270;
             ball.dx=1;
             ball.dy=-1;
 
-            for (let row=0;row<6;row++){
+            for (let row=0;row<4;row++){
                 operator.bricks[row]=[];
-                for (let col=0;col<4;col++){
-                    operator.bricks[row][col]=new Brick(123+row*66,33+col*33);
+                for (let col=0;col<6;col++){
+                    operator.bricks[row][col]=new Brick(123+col*66,33+row*33);
                     operator.bricks[row][col].draw();
-                    console.log("Drew brick at",row,col);
                 }
             }
             operator.remBricks=24;
