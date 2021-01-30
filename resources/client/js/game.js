@@ -131,6 +131,7 @@ window.onload=function () {
 
             ball.x+=ball.dx;
             ball.y+=ball.dy;
+
 /*
             let newX = operator.mouseX;
             let newY = operator.mouseY;
@@ -156,6 +157,7 @@ window.onload=function () {
         mouseX:0,
         mouseY:0,
         canvas:gameCanvas,
+        intervalID:0,
 
         setMouseX:function (e) {
             operator.mouseX=Math.min(Math.max(e.clientX-operator.canvas.getBoundingClientRect().left,0),545);
@@ -165,6 +167,9 @@ window.onload=function () {
         frame:function () {
             paddle.redraw();
             ball.redraw();
+            if (ball.y>=300) {
+                operator.endGame();
+            }
         },
 
         startLevel:function () {
@@ -182,7 +187,34 @@ window.onload=function () {
                 }
             }
             operator.remBricks=24;
+
+            operator.level++;
+            document.getElementById("levelText").innerHTML=operator.level;
         },
+
+        startGame:function () {
+            console.log("Game start");
+            document.getElementById("gameOverMsg").style.visibility="hidden";
+            document.getElementById("restartButton").style.visibility="hidden";
+            document.getElementById("restartButton").removeEventListener("mousedown",operator.startGame);
+
+            operator.score=0;
+            operator.level=0;
+            document.getElementById("scoreText").innerHTML=operator.score;
+            document.getElementById("levelText").innerHTML=operator.level;
+
+            operator.intervalID=window.setInterval(operator.frame, 10);
+
+            operator.startLevel();
+        },
+
+        endGame:function () {
+            clearInterval(operator.intervalID);
+            ctx.clearRect(0,0,gameCanvas.width,gameCanvas.height);
+            document.getElementById("gameOverMsg").style.visibility="visible";
+            document.getElementById("restartButton").style.visibility="visible";
+            document.getElementById("restartButton").addEventListener("mousedown",operator.startGame);
+        }
     };
 
     /* Class for constructing brick objects
@@ -201,6 +233,8 @@ window.onload=function () {
         destroy(){
             ctx.clearRect(this.x,this.y,64,31);
             operator.score++;
+            document.getElementById("scoreText").innerHTML=operator.score;
+
             operator.remBricks--;
             this.alive=false;
             if (operator.remBricks==0){
@@ -209,9 +243,8 @@ window.onload=function () {
         }
     }
 
-    operator.startLevel();
-
     document.onmousemove=operator.setMouseX;
-    window.setInterval(operator.frame, 10);
+    operator.startGame();
+
 }
 

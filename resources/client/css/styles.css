@@ -14,3 +14,11 @@
 #spriteSheet{
     display: none;
 }
+
+#gameOverMsg{
+    visibility: hidden;
+}
+
+#restartButton{
+    visibility: hidden;
+}

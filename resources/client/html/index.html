@@ -10,6 +10,7 @@
 <body>
     <a href="scores.html">Leaderboard</a>
     <img id="spriteSheet" src="../images/spriteSheet.png">
+
     <div id="scoreBoard">
         <table>
             <tr>
@@ -17,7 +18,7 @@
                     <p>Score:</p>
                 </td>
                 <td>
-                    <p id="scoreText"></p>
+                    <p id="scoreText">0</p>
                 </td>
             </tr>
 
@@ -34,11 +35,17 @@
                 <td>
                     <p>Level:</p>
                 </td>
+                <td>
+                    <p id="levelText"></p>
+                </td>
             </tr>
         </table>
     </div>
+
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
+        <h1 id="gameOverMsg">Game Over</h1>
+        <button id="restartButton" type="button">Restart</button>
     </div>
 </body>
 </html>
