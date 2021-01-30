@@ -11,7 +11,9 @@ window.onload=function () {
     gameCanvas.width=640;
     gameCanvas.height=320;
 
+    //Object representing the paddle
     var paddle={
+        //dx stores change in x-coordinate per frame
         x:0,
         dx:0,
 
@@ -23,11 +25,14 @@ window.onload=function () {
         }
     };
 
+    //Object representing the ball, dealing with collisions
     var ball={
+        //dx and dy store change in coordinates per frame
         x:0,
         dx:1,
         y:0,
         dy:1,
+        maxSpeed:5,
 
         hitEdge:function () {
             if ((ball.dx>0 && ball.x+ball.dx>617) || ball.x+ball.dx<0){
@@ -62,29 +67,31 @@ window.onload=function () {
 
         checkBricks:function () {
             if (ball.x+ball.dx>=100
-                && ball.x+ball.dx<=494
-                && ball.y+ball.dy<=140
+                && ball.x+ball.dx<=518
                 && ball.y+ball.dy>=10
+                && ball.y+ball.dy<=164
             ){
-                let row=Math.floor((ball.y+ball.dy-10)/33);
-                let col=Math.floor((ball.x+ball.dx-100)/66);
-                console.log(col,row);
+                let row=Math.floor((ball.y+ball.dy-33)/33);
+                let col=Math.floor((ball.x+ball.dx-123)/66);
                 let onEdgeX=false;
                 let onEdgeY=false;
-                if (col!==5 && (ball.x+ball.dx-100)%66>=43){
+                if (col==-1 || (col!==5 && (ball.x+ball.dx-123)%66>=43)){
                     onEdgeX=true;
                 }
-                if (row!==3 && (ball.y+ball.dy-10)%33>=10){
+                if (row==-1 || (row!==3 && (ball.y+ball.dy-33)%33>=10)){
                     onEdgeY=true;
                 }
-                ball.hitBrick(row,col);
-                if (onEdgeX){
+
+                if (row!==-1 && col!==-1){
+                    ball.hitBrick(row,col);
+                }
+                if (row!==-1 && onEdgeX){
                     ball.hitBrick(row,col+1);
                 }
-                if (onEdgeY){
+                if (onEdgeY && col!==-1){
                     ball.hitBrick(row+1,col);
                 }
-                if (onEdgeX && onEdgeY){
+                if (onEdgeY && onEdgeX){
                     ball.hitBrick(row+1,col+1);
                 }
             }
@@ -92,7 +99,6 @@ window.onload=function () {
 
         hitBrick:function (row, col) {
             let brick=operator.bricks[row][col];
-            ctx.drawImage(spriteSheet,1,40,64,31,brick.x,brick.y,64,31);
             if (brick.alive
                 && ball.x+ball.dx>=brick.x-23
                 && ball.x+ball.dx<=brick.x+64
@@ -107,6 +113,7 @@ window.onload=function () {
                 }
                 brick.destroy();
             }
+//            ctx.drawImage(spriteSheet,1,80,64,31,brick.x,brick.y,64,31);
         },
 
         redraw:function () {
@@ -115,23 +122,44 @@ window.onload=function () {
             ball.hitEdge();
             ball.hitPaddle();
             ball.checkBricks();
+
+            if (ball.dx>ball.maxSpeed){
+                ball.dx=ball.maxSpeed;
+            } else if (ball.dx<-1*ball.maxSpeed){
+                ball.dx=-1*ball.maxSpeed;
+            }
+
             ball.x+=ball.dx;
             ball.y+=ball.dy;
+/*
+            let newX = operator.mouseX;
+            let newY = operator.mouseY;
+
+            ball.dx=newX-ball.x;
+            ball.dy=newY-ball.y;
+            ball.x+=ball.dx;
+            ball.y+=ball.dy;
+*/
+
             ctx.drawImage(spriteSheet,1,80,23,23,ball.x,ball.y,23,23);
         }
 
     };
 
+    //Object representing the game itself
     var operator={
+        //remBricks stores count of remaining bricks
         score:0,
         level:0,
         bricks:[],
         remBricks:0,
         mouseX:0,
+        mouseY:0,
         canvas:gameCanvas,
 
         setMouseX:function (e) {
             operator.mouseX=Math.min(Math.max(e.clientX-operator.canvas.getBoundingClientRect().left,0),545);
+            operator.mouseY=Math.min(Math.max(e.clientY-operator.canvas.getBoundingClientRect().top,0),320);
         },
 
         frame:function () {
@@ -157,6 +185,10 @@ window.onload=function () {
         },
     };
 
+    /* Class for constructing brick objects
+    * Brick objects are stored as a 2d array property of operator
+    * The array is indexed by row and column
+    * Bricks are simple objects that can create or destroy themselves */
     class Brick{
         constructor(x,y) {
             this.x=x;
