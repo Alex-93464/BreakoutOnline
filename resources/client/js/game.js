@@ -180,9 +180,7 @@ window.onload=function () {
             ball.dy=-1;
 
             for (let row=0;row<4;row++){
-                operator.bricks[row]=[];
                 for (let col=0;col<6;col++){
-                    operator.bricks[row][col]=new Brick(123+col*66,33+row*33);
                     operator.bricks[row][col].draw();
                 }
             }
@@ -193,7 +191,6 @@ window.onload=function () {
         },
 
         startGame:function () {
-            console.log("Game start");
             document.getElementById("gameOverMsg").style.visibility="hidden";
             document.getElementById("restartButton").style.visibility="hidden";
             document.getElementById("restartButton").removeEventListener("mousedown",operator.startGame);
@@ -228,6 +225,7 @@ window.onload=function () {
             this.alive=true;
         }
         draw(){
+            this.alive=true;
             ctx.drawImage(spriteSheet,1,1,64,31,this.x,this.y,64,31);
         }
         destroy(){
@@ -243,6 +241,12 @@ window.onload=function () {
         }
     }
 
+    for (let row=0;row<4;row++){
+        operator.bricks[row]=[];
+        for (let col=0;col<6;col++){
+            operator.bricks[row][col]=new Brick(123+col*66,33+row*33);
+        }
+    }
     document.onmousemove=operator.setMouseX;
     operator.startGame();
 

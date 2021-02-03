@@ -48,7 +48,7 @@ public class Client {
     @Path("{path}")
     @Produces({"text/html"})
     public byte[] getIHTMLFile(@PathParam("path") String path) {
-        return getFile("client/" + path);
+        return getFile("client/html/" + path);
     }
 
     @GET
@@ -61,7 +61,7 @@ public class Client {
     private static byte[] getFile(String filename) {
         try {
 
-            File file = new File("resources/" + filename);
+            File file = new File("resources" + filename);
             byte[] fileData = new byte[(int) file.length()];
             DataInputStream dis = new DataInputStream(new FileInputStream(file));
             dis.readFully(fileData);
